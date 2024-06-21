@@ -15,6 +15,16 @@ Path = list[Key]
 JSONObject = Union[list, dict]
 
 
+class PathNotFoundError(Exception):
+    def __init__(self, cur_path: Path, key: Key):
+        super().__init__()
+        self.cur_path = cur_path
+        self.key = key
+
+    def __str__(self) -> str:
+        return "path={} key={}".format(repr(self.cur_path), repr(self.key))
+
+
 def concat_path(path: str, obj_path: str) -> str:
     """
     Concat path.
@@ -26,11 +36,32 @@ def concat_path(path: str, obj_path: str) -> str:
     Returns:
         str: A path formed by joining two paths.
     """
-    
+
     # Remove $
     obj_path = obj_path[1:]
 
     return path + obj_path
+
+
+def str_path(path: Path) -> str:
+    """
+    Returns a string path.
+
+    Args:
+        path (Path): A path.
+
+    Returns:
+        str: A string path.
+    """
+
+    obj = "$"
+    for key in path:
+        if isinstance(key, int):
+            obj += f"[{key}]"
+        else:
+            obj += f".{key}"
+
+    return obj
 
 
 def get_safe_key(key: str) -> str:
@@ -107,13 +138,14 @@ def parse_path(path_str: str) -> Path:
     return path
 
 
-def get(target: JSONObject, path: str | Path) -> Any:
+def get(target: JSONObject, path: str | Path, default: Any = ...) -> Any:
     """
     Get the value specified by path from target.
 
     Args:
         target (JSONObject): A json object.
         path (Union[str, Path]): The specified path.
+        Optional - default (Any): Value to return if not found.
 
     Returns:
         Any: The value specified by path from target.
@@ -121,8 +153,15 @@ def get(target: JSONObject, path: str | Path) -> Any:
     if isinstance(path, str):
         path = parse_path(path)
 
-    for cur_key in path:
-        target = target[cur_key]
+    for i in range(len(path)):
+        if (isinstance(target, list) and (not isinstance(path[i], int) or (path[i] >= len(target))))\
+                or (isinstance(target, dict) and (not isinstance(path[i], str) or (path[i] not in target))):
+            if default is ...:
+                raise PathNotFoundError(path[:i], path[i])
+            else:
+                return default
+
+        target = target[path[i]]
 
     return target
 

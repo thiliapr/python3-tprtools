@@ -6,7 +6,6 @@
 
 # TkJSONPath
 这是一个简单的JSONPath解析器。
-- 版本: 1.0.0
 - 版权: 根据GPL-3.0或更高版本分发。
 
 ## 语言
@@ -40,4 +39,24 @@
   4. 将`src`复制出一份副本，赋值给`dst`。
   5. 赋值给`dst`中路径`$.docs[1].id`的值，值为`4`。
 
-关于全部函数的使用，请参阅[文档](docs/index.zh-CN.md)。
+## 类型
+- `Key: Union[int, str]`
+  指示JSON的键的类型。
+- `Path: list[Key]`
+  指示JSONPath的路径的类型。
+- `JSONObject: Union[list, dict]`
+  指示JSON对象的类型。
+
+## 函数
+- `concat_path(path: str, obj_path: str) -> str`
+  将两个路径连接起来。
+- `str_path(path: Path) -> str`
+  将Path型的路径转化为字符串型。
+- `get_safe_key(key: str) -> str`
+  获取安全的键值。（用于字符串型路径）
+- `parse_path(path_str: str) -> Path`
+  将字符串型的路径转化为Path型。
+- `get(target: JSONObject, path: str | Path, default: Any = ...) -> Any:`
+  从`target`中获取指定路径的值。
+- `assign(target: JSONObject, path: str | Path, value: Any) -> Any`
+  给`target`的路径`path`赋值。

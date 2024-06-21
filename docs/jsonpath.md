@@ -6,7 +6,6 @@
 
 # TkJSONPath
 This is a simple JSONPath parser.
-- Version: 1.0.0
 - License: Distributed under GPL-3.0 or later.
 
 ## Languages
@@ -40,4 +39,24 @@ This is a simple JSONPath parser.
   4. Create a copy of `src` and assign it to `dst`.
   5. Assign the value `4` to the path `$.docs[1].id` in `dst`.
 
-For complete function usage, please refer to the [documentation](docs/index.md).
+## Types
+- `Key: Union[int, str]`
+  Indicates the type of JSON key.
+- `Path: list[Key]`
+  Indicates the type of JSONPath path.
+- `JSONObject: Union[list, dict]`
+  Indicates the type of JSON object.
+
+## Functions
+- `concat_path(path: str, obj_path: str) -> str`
+  Concatenate two paths.
+- `str_path(path: Path) -> str`
+  Convert a Path type path to a string type.
+- `get_safe_key(key: str) -> str`
+  Get a safe key value. (For string type paths)
+- `parse_path(path_str: str) -> Path`
+  Convert a string type path to a Path type.
+- `get(target: JSONObject, path: str | Path, default: Any = ...) -> Any:`
+  Get the value of the specified path from `target`.
+- `assign(target: JSONObject, path: str | Path, value: Any) -> Any`
+  Assigns a value to the path `path` of `target`.

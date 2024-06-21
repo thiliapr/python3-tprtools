@@ -6,7 +6,7 @@
 
 # Thiliapr Tools
 A Python3 library written by thiliapr containing various tools.
-- Version: 1.0.0
+- Version: 1.0.1
 - License: Distributed under GPL-3.0 or later.
 
 ## Languages
