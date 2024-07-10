@@ -16,13 +16,14 @@ JSONObject = Union[list, dict]
 
 
 class PathNotFoundError(Exception):
-    def __init__(self, cur_path: Path, key: Key):
+    def __init__(self, target_type: type, cur_path: Path, key: Key):
         super().__init__()
+        self.target_type = target_type
         self.cur_path = cur_path
         self.key = key
 
     def __str__(self) -> str:
-        return "path={} key={}".format(repr(self.cur_path), repr(self.key))
+        return "type={} path={} key={}".format(repr(self.target_type), repr(self.cur_path), repr(self.key))
 
 
 def concat_path(path: str, obj_path: str) -> str:
@@ -150,18 +151,37 @@ def get(target: JSONObject, path: str | Path, default: Any = ...) -> Any:
     Returns:
         Any: The value specified by path from target.
     """
+
     if isinstance(path, str):
         path = parse_path(path)
+    old_path: list[Union[str, int]] = []
 
-    for i in range(len(path)):
-        if (isinstance(target, list) and (not isinstance(path[i], int) or (path[i] >= len(target))))\
-                or (isinstance(target, dict) and (not isinstance(path[i], str) or (path[i] not in target))):
-            if default is ...:
-                raise PathNotFoundError(path[:i], path[i])
-            else:
-                return default
+    while path:
+        key = path[0]
 
-        target = target[path[i]]
+        # Catch Exception
+        if not (isinstance(target, dict) or isinstance(target, list)):
+            pass
+        elif isinstance(target, list) and ((not isinstance(key, int)) or (key >= len(target))):
+            pass
+        elif isinstance(target, dict) and ((not isinstance(key, str)) or (key not in target)):
+            pass
+        else:
+            # Setting target
+            target = target[key]
+
+            # path[0] -> old_path[-1]
+            old_path.append(key)
+            path.pop(0)
+
+            # Continue
+            continue
+
+        # Throw Exception
+        if default is ...:
+            raise PathNotFoundError(type(target), old_path, key)
+        else:
+            return default
 
     return target
 
